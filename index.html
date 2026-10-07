@@ -201,6 +201,9 @@ figure.pic figcaption { font-size: 11px; color: var(--muted); margin-top: 3px; }
   aside.panel { border-left: 0; border-top: 1px solid var(--line); }
   .brand span { display: none; }
   .brand b { font-size: 16px; }
+  header.top { flex-wrap: wrap; row-gap: 8px; padding: 8px 16px; }
+  .search { order: 3; flex: 1 0 100%; max-width: none; margin-left: 0; }
+  #themeBtn { margin-left: auto; padding: 5px 9px; }
   .pin { padding: 16px 16px 28px; }
   h1.place { font-size: 26px; }
   .main { grid-template-rows: minmax(0, 1fr) minmax(0, 40%); }
@@ -267,7 +270,7 @@ const inWindow = (y) => (y == null ? fullRange() : y >= S.y0 && y <= S.y1);
 const personOn = (p) => S.cls.has(p.cls);
 
 // ── Map ─────────────────────────────────────────────────────────────────────
-const map = L.map("map", { zoomControl: false, minZoom: 2, maxZoom: 12, zoomSnap: 0.5, worldCopyJump: false, maxBounds: [[-75, -230], [85, 230]] }).setView([32, -12], 2.5);
+const map = L.map("map", { zoomControl: false, minZoom: 2, maxZoom: 12, zoomSnap: 0.5, worldCopyJump: false, maxBounds: [[-75, -230], [85, 230]] }).setView([32, -12], window.innerWidth < 600 ? 1.5 : 2.5);
 L.control.zoom({ position: "topleft" }).addTo(map);
 map.attributionControl.setPrefix(false).addAttribution("Outlines: Natural Earth · Routes: Sephardi Spaces");
 for (const [name, z] of [["land", 200], ["flows", 380], ["places", 420], ["route", 460]]) map.createPane(name).style.zIndex = z;
@@ -778,7 +781,17 @@ document.addEventListener("change", (e) => {
   if (e.target.id === "lySpaces") { S.spaces = e.target.checked; drawSpaces(); }
 });
 map.on("zoomend", () => drawBase());
-let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(drawTimeline, 120); });
+// Redraw when the map's box changes size: a window resize, or the WordPress
+// page fitting the Atlas to the screen after it has already drawn.
+let rz;
+new ResizeObserver(() => {
+  clearTimeout(rz);
+  rz = setTimeout(() => {
+    map.invalidateSize();
+    if (D) { drawLand(WORLD); drawBase(); drawOverlay(); }
+    drawTimeline();
+  }, 120);
+}).observe(document.getElementById("map"));
 
 // Theme changes: Leaflet holds literal colours, so redraw everything.
 let WORLD;
