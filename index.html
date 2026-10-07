@@ -253,15 +253,182 @@ const SITE = "https://sepharad.miami.edu";
 const MIN_Y = 1000, MAX_Y = 2026, BREAK_Y = 1450; // the timeline squeezes 1000–1450
 const PLAY_WINDOW = 40, PLAY_STEP = 3, PLAY_MS = 120;
 
+// ── Languages ───────────────────────────────────────────────────────────────
+// English, Spanish and Ladino (Aki Yerushalayim spelling, as on the site's
+// Ladino pages). Choose with ?lang=es or ?lang=lad. The route texts themselves
+// come from the story-map sheets and stay in English.
+const CLS_NAMES = {
+  "Western Sephardi": { es: ["Sefardí occidental", "Sefardíes occidentales"], lad: ["Sefaradi oksidental", "Sefaradim oksidentales"] },
+  "Eastern Sephardi": { es: ["Sefardí oriental", "Sefardíes orientales"], lad: ["Sefaradi oriental", "Sefaradim orientales"] },
+  "North African Sephardi": { es: ["Sefardí norteafricano", "Sefardíes norteafricanos"], lad: ["Sefaradi del Norte de Afrika", "Sefaradim del Norte de Afrika"] },
+  "Mizrahi Sephardi": { es: ["Sefardí mizrají", "Sefardíes mizrajíes"], lad: ["Sefaradi mizrahi", "Sefaradim mizrahim"] },
+  "Iberian Sephardi": { es: ["Sefardí ibérico", "Sefardíes ibéricos"], lad: ["Sefaradi iberiko", "Sefaradim iberikos"] },
+  "Crypto-Sephardi (Converso Legacy)": { es: ["Criptosefardí (legado converso)", "Criptosefardíes (legado converso)"], lad: ["Kripto-sefaradi (erensia konversa)", "Kripto-sefaradim (erensia konversa)"] },
+  "Other Sephardi": { es: ["Otro sefardí", "Otros sefardíes"], lad: ["Otro sefaradi", "Otros sefaradim"] },
+  Unclassified: { es: ["Sin clasificar", "Sin clasificar"], lad: ["Sin klasifikasion", "Sin klasifikasion"] },
+};
+const n_ = (n, loc) => n.toLocaleString(loc);
+const LANGS = {
+  en: {
+    locale: "en-US", docTitle: "Sephardi Spaces Atlas", brand: "Sephardi Spaces Atlas",
+    searchPh: "Search a name, surname or city", searchAria: "Search people, surnames and places",
+    night: "☾ Night", day: "☀ Day", themeAria: "Switch between day and night map",
+    mapAria: "Map of Sephardi migration routes", yearText: "Year in the story", yearEst: "Year estimated",
+    play: "▶ Play", pause: "❚❚ Pause", allYears: "All years",
+    tlAria: "Number of route stops per decade. Drag the handles to choose a time window.",
+    loading: "Loading the atlas…", attribution: "Outlines: Natural Earth · Routes: Sephardi Spaces",
+    lines: "Migration lines", spaces: "World Map spaces",
+    people: (n) => `${n_(n, "en-US")} ${n === 1 ? "person" : "people"}`,
+    stops: (n) => `${n_(n, "en-US")} ${n === 1 ? "stop" : "stops"}`,
+    places: (n) => `${n_(n, "en-US")} ${n === 1 ? "place" : "places"}`,
+    onMap: (people, filtered) => `${people} on the map${filtered ? " · filtered" : ""}`,
+    decade: (d) => `${d}s`, tipCounts: (a, b) => `${a} with a year in the story, ${b} estimated`,
+    kindShort: { place: "place", object: "object or document", memory: "memory" },
+    kindLong: { place: "Place or monument", object: "Object or document", memory: "Person, family or community memory" },
+    worldMap: "World Map", worldMapLong: "Sephardi World Map", stop: "Stop", dateUnknown: "date unknown",
+    back: "Back", overview: "Overview", from: (p) => `from ${p}`, then: (p) => `then ${p}`,
+    eyebrow: "Sephardi Spaces · University of Miami", title: "Where Sephardi lives crossed",
+    lead: "Every migration route in the Sephardi Spaces archive on one map. Drag the timeline to choose years, or press Play to watch the routes unfold. Select a city to see who passed through it.",
+    statLives: "lives", statStops: "route stops", statPlaces: "places", statSpaces: "World Map spaces",
+    stories: "Guided stories", steps: (n) => `${n} steps`, busiest: "Busiest places", noRoutes: "No routes in these years.",
+    communities: "Communities", chipsHelp: "Select a group to hide or show it. The classification comes from each character's profile.",
+    builtNote: (date, undated) => `Built on ${date} from the team's route sheets and the Sephardi World Map. Years printed plainly come from the story text; years marked “c.” are estimated from the order of the route and the person's birth and death. ${undated} stops have no year and appear only when all years are shown.`,
+    contentNote: "",
+    place: "Place", years: "years", showing: (a, b) => `Showing ${a}–${b}.`, showAll: "Show all years",
+    sitesNamed: "Sites named in the stories", onWorldMap: "On the Sephardi World Map", whoCame: "Who came here",
+    noOne: "No one in these years.", alsoAs: (list) => `Also recorded nearby as: ${list}.`,
+    aka: (n) => `also known as ${n}`, profile: "Full profile ↗", storyMap: "Story map ↗", readMore: "Read more",
+    storyStep: (i, n) => `Guided story · step ${i} of ${n}`, prevStep: "Previous step", stepN: (i) => `Step ${i}`, next: "Next ›",
+    draftNote: "This story is a draft assembled from the route sheets. Its steps live in <code>stories.json</code>, so the team can add or reorder steps without touching the map.",
+    noStory: "No story has been added for this point yet.", source: "Source ↗", sourceText: "Source:",
+    routesThrough: (p) => `Routes through ${p}`, seeEveryone: "See everyone who passed through",
+    worldMapNote: (url) => `Points on the World Map are added by the public through the survey on <a href="${url}" target="_blank" rel="noopener">the World Map page</a>.`,
+    worldMapUrl: "https://sepharad.miami.edu/sephardi-map/",
+    search: "Search", surnameMap: "Surname map", showSurname: (n, q) => `Show all ${n} people named ${q} on the map`,
+    surnameHelp: "Their routes are drawn together, so you can see where the name travelled.",
+    placesH: "Places", peopleH: "People", noName: "No one by that name. Try a surname or a city.",
+    surnameLead: (people, places) => `${people} in ${places}. Their routes are drawn in orange.`,
+    loadFail: "The atlas could not load", reload: "Reload the page to try again.",
+  },
+  es: {
+    locale: "es-ES", docTitle: "Atlas Sefardí · Sephardi Spaces", brand: "Atlas Sefardí",
+    searchPh: "Busque un nombre, apellido o ciudad", searchAria: "Buscar personas, apellidos y lugares",
+    night: "☾ Noche", day: "☀ Día", themeAria: "Cambiar entre el mapa de día y el de noche",
+    mapAria: "Mapa de las rutas migratorias sefardíes", yearText: "Año indicado en el relato", yearEst: "Año estimado",
+    play: "▶ Reproducir", pause: "❚❚ Pausa", allYears: "Todos los años",
+    tlAria: "Número de etapas por década. Arrastre los controles para elegir un período.",
+    loading: "Cargando el atlas…", attribution: "Contornos: Natural Earth · Rutas: Sephardi Spaces",
+    lines: "Líneas de migración", spaces: "Espacios del Mapa Mundial",
+    people: (n) => `${n_(n, "es-ES")} ${n === 1 ? "persona" : "personas"}`,
+    stops: (n) => `${n_(n, "es-ES")} ${n === 1 ? "etapa" : "etapas"}`,
+    places: (n) => `${n_(n, "es-ES")} ${n === 1 ? "lugar" : "lugares"}`,
+    onMap: (people, filtered) => `${people} en el mapa${filtered ? " · con filtro" : ""}`,
+    decade: (d) => `Década de ${d}`, tipCounts: (a, b) => `${a} con año en el relato, ${b} estimadas`,
+    kindShort: { place: "lugar", object: "objeto o documento", memory: "memoria" },
+    kindLong: { place: "Lugar o monumento", object: "Objeto o documento", memory: "Memoria de una persona, familia o comunidad" },
+    worldMap: "Mapa Mundial", worldMapLong: "Mapa Mundial Sefardí", stop: "Etapa", dateUnknown: "fecha desconocida",
+    back: "Volver", overview: "Inicio", from: (p) => `desde ${p}`, then: (p) => `luego ${p}`,
+    eyebrow: "Sephardi Spaces · Universidad de Miami", title: "Donde se cruzaron las vidas sefardíes",
+    lead: "Todas las rutas migratorias del archivo de Sephardi Spaces en un solo mapa. Arrastre la línea de tiempo para elegir los años, o pulse Reproducir para ver cómo se despliegan las rutas. Seleccione una ciudad para ver quiénes pasaron por ella.",
+    statLives: "vidas", statStops: "etapas", statPlaces: "lugares", statSpaces: "espacios del Mapa Mundial",
+    stories: "Relatos guiados", steps: (n) => `${n} pasos`, busiest: "Lugares con más personas", noRoutes: "No hay rutas en estos años.",
+    communities: "Comunidades", chipsHelp: "Seleccione un grupo para ocultarlo o mostrarlo. La clasificación proviene del perfil de cada personaje.",
+    builtNote: (date, undated) => `Creado el ${date} a partir de las hojas de rutas del equipo y del Mapa Mundial Sefardí. Los años sin marca provienen del texto del relato; los años marcados con «c.» se estiman según el orden de la ruta y las fechas de nacimiento y muerte. ${undated} etapas no tienen año y solo aparecen cuando se muestran todos los años.`,
+    contentNote: "Los textos de cada etapa están en inglés, tal como aparecen en los mapas narrativos de los personajes.",
+    place: "Lugar", years: "años", showing: (a, b) => `Mostrando ${a}–${b}.`, showAll: "Mostrar todos los años",
+    sitesNamed: "Lugares mencionados en los relatos", onWorldMap: "En el Mapa Mundial Sefardí", whoCame: "Quiénes llegaron aquí",
+    noOne: "Nadie en estos años.", alsoAs: (list) => `También registrado en las cercanías como: ${list}.`,
+    aka: (n) => `también conocido como ${n}`, profile: "Perfil completo ↗", storyMap: "Mapa narrativo ↗", readMore: "Leer más",
+    storyStep: (i, n) => `Relato guiado · paso ${i} de ${n}`, prevStep: "Paso anterior", stepN: (i) => `Paso ${i}`, next: "Siguiente ›",
+    draftNote: "Este relato es un borrador elaborado a partir de las hojas de rutas; el equipo puede modificarlo.",
+    noStory: "Todavía no se ha añadido un relato para este punto.", source: "Fuente ↗", sourceText: "Fuente:",
+    routesThrough: (p) => `Rutas que pasan por ${p}`, seeEveryone: "Ver a todos los que pasaron por allí",
+    worldMapNote: (url) => `El público añade los puntos del Mapa Mundial mediante el formulario de <a href="${url}" target="_blank" rel="noopener">la página del Mapa Mundial</a>.`,
+    worldMapUrl: "https://sepharad.miami.edu/es/mapa-mundial-sefardi/",
+    search: "Búsqueda", surnameMap: "Mapa de apellidos", showSurname: (n, q) => `Mostrar en el mapa a las ${n} personas de apellido ${q}`,
+    surnameHelp: "Sus rutas se dibujan juntas para ver por dónde viajó el apellido.",
+    placesH: "Lugares", peopleH: "Personas", noName: "No hay nadie con ese nombre. Pruebe con un apellido o una ciudad.",
+    surnameLead: (people, places) => `${people} en ${places}. Sus rutas aparecen en naranja.`,
+    loadFail: "No se pudo cargar el atlas", reload: "Vuelva a cargar la página para intentarlo de nuevo.",
+  },
+  lad: {
+    locale: "es-ES", docTitle: "Atlas Sefaradi · Sephardi Spaces", brand: "Atlas Sefaradi",
+    searchPh: "Bushka un nombre, alkunya o sivdad", searchAria: "Bushkar personas, alkunyas i lugares",
+    night: "☾ Noche", day: "☀ Dia", themeAria: "Trokar entre el mapa de dia i el de noche",
+    mapAria: "Mapa de los kaminos de migrasion sefaradis", yearText: "Anyo en la estoria", yearEst: "Anyo estimado",
+    play: "▶ Ampesar", pause: "❚❚ Pauza", allYears: "Todos los anyos",
+    tlAria: "Kantidad de etapas por dekada. Mueve los kontroles para eskojer los anyos.",
+    loading: "Kargando el atlas…", attribution: "Kontornos: Natural Earth · Kaminos: Sephardi Spaces",
+    lines: "Liniyas de migrasion", spaces: "Espasios del Mapa del Mundo",
+    people: (n) => `${n_(n, "es-ES")} ${n === 1 ? "persona" : "personas"}`,
+    stops: (n) => `${n_(n, "es-ES")} ${n === 1 ? "etapa" : "etapas"}`,
+    places: (n) => `${n_(n, "es-ES")} ${n === 1 ? "lugar" : "lugares"}`,
+    onMap: (people, filtered) => `${people} en el mapa${filtered ? " · kon filtro" : ""}`,
+    decade: (d) => `Dekada de ${d}`, tipCounts: (a, b) => `${a} kon anyo en la estoria, ${b} estimadas`,
+    kindShort: { place: "lugar", object: "objeto o dokumento", memory: "memoria" },
+    kindLong: { place: "Lugar o monumento", object: "Objeto o dokumento", memory: "Memoria de una persona, famiya o komunidad" },
+    worldMap: "Mapa del Mundo", worldMapLong: "Mapa del Mundo Sefaradi", stop: "Etapa", dateUnknown: "data no konosida",
+    back: "Atras", overview: "Prinsipio", from: (p) => `de ${p}`, then: (p) => `despues ${p}`,
+    eyebrow: "Sephardi Spaces · Universidad de Miami", title: "Ande se krusaron las vidas sefaradis",
+    lead: "Todos los kaminos de migrasion del arshivo de Sephardi Spaces en un solo mapa. Mueve la liniya del tiempo para eskojer los anyos, o apreta Ampesar para ver komo se avren los kaminos. Eskoje una sivdad para ver ken paso por ayi.",
+    statLives: "vidas", statStops: "etapas", statPlaces: "lugares", statSpaces: "espasios del Mapa del Mundo",
+    stories: "Estorias gidadas", steps: (n) => `${n} pasos`, busiest: "Lugares kon mas personas", noRoutes: "No ay kaminos en estos anyos.",
+    communities: "Komunidades", chipsHelp: "Eskoje un grupo para eskonderlo o amostrarlo. La klasifikasion viene del profil de kada personaje.",
+    builtNote: (date, undated) => `Echo el ${date} kon las ojas de kaminos del ekipo i el Mapa del Mundo Sefaradi. Los anyos sin marka vienen del teksto de la estoria; los anyos kon «c.» son estimados segun el orden del kamino i las datas de nasimiento i muerte. ${undated} etapas no tienen anyo i aparesen solo kuando se amostran todos los anyos.`,
+    contentNote: "Los tekstos de kada etapa estan en inglez, komo aparesen en los mapas de las estorias de los personajes.",
+    place: "Lugar", years: "anyos", showing: (a, b) => `Amostrando ${a}–${b}.`, showAll: "Amostrar todos los anyos",
+    sitesNamed: "Lugares mensionados en las estorias", onWorldMap: "En el Mapa del Mundo Sefaradi", whoCame: "Ken vino aki",
+    noOne: "Dinguno en estos anyos.", alsoAs: (list) => `Tambien rejistrado serka komo: ${list}.`,
+    aka: (n) => `tambien konosido komo ${n}`, profile: "Profil kompleto ↗", storyMap: "Mapa de la estoria ↗", readMore: "Meldar mas",
+    storyStep: (i, n) => `Estoria gidada · paso ${i} de ${n}`, prevStep: "Paso anterior", stepN: (i) => `Paso ${i}`, next: "Sigiente ›",
+    draftNote: "Esta estoria es un borrador echo kon las ojas de kaminos; el ekipo la puede trokar.",
+    noStory: "Ainda no ay una estoria para este punto.", source: "Fuente ↗", sourceText: "Fuente:",
+    routesThrough: (p) => `Kaminos ke pasan por ${p}`, seeEveryone: "Ver a todos los ke pasaron por ayi",
+    worldMapNote: (url) => `La djente adjusta los puntos del Mapa del Mundo kon el formulario de <a href="${url}" target="_blank" rel="noopener">la pajina del Mapa del Mundo</a>.`,
+    worldMapUrl: "https://sepharad.miami.edu/lad/mapa-del-mundo-sefaradi/",
+    search: "Bushkeda", surnameMap: "Mapa de alkunyas", showSurname: (n, q) => `Amostrar en el mapa las ${n} personas kon la alkunya ${q}`,
+    surnameHelp: "Sus kaminos se amostran djuntos para ver por ande viajo la alkunya.",
+    placesH: "Lugares", peopleH: "Personas", noName: "No ay dinguno kon este nombre. Prova kon una alkunya o una sivdad.",
+    surnameLead: (people, places) => `${people} en ${places}. Sus kaminos aparesen en kolor portokal.`,
+    loadFail: "El atlas no se pudo kargar", reload: "Kargua la pajina de muevo para provar otra vez.",
+  },
+};
+const LANG = (() => {
+  let l = "";
+  try { l = (new URLSearchParams(location.search).get("lang") || "").toLowerCase(); } catch {}
+  return LANGS[l] ? l : "en";
+})();
+const T = LANGS[LANG];
+const clsName = (c, many = false) => (LANG === "en" ? c : CLS_NAMES[c]?.[LANG]?.[many ? 1 : 0] || c);
+const storyText = (s, field) => s[`${field}_${LANG}`] || s[field];
+
 // ── Helpers ─────────────────────────────────────────────────────────────────
 const $ = (s, r = document) => r.querySelector(s);
 const fold = (s) => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-const yearLabel = (s) => (s.y == null ? "date unknown" : s.k ? String(s.y) : `c. ${s.y}`);
+const yearLabel = (s) => (s.y == null ? T.dateUnknown : s.k ? String(s.y) : `c. ${s.y}`);
 const lifeSpan = (p) => (p.b || p.dd ? `${p.b || "?"}–${p.dd || "?"}` : "");
 const paras = (t) => esc(t).split(/\n+/).map((x) => `<p>${x}</p>`).join("");
-const plural = (n, one, many = one + "s") => `${n.toLocaleString()} ${n === 1 ? one : many}`;
+// Static text in the page (written in English) is switched to the chosen language.
+function applyStaticText() {
+  document.documentElement.lang = LANG;
+  document.title = T.docTitle;
+  $(".brand b").textContent = T.brand;
+  $("#q").placeholder = T.searchPh;
+  $("#q").setAttribute("aria-label", T.searchAria);
+  $("#themeBtn").setAttribute("aria-label", T.themeAria);
+  $("#map").setAttribute("aria-label", T.mapAria);
+  const key = document.querySelectorAll(".tl-key > span");
+  key[0].lastChild.textContent = T.yearText;
+  key[1].lastChild.textContent = T.yearEst;
+  $("#play").textContent = T.play;
+  $("#reset").textContent = T.allYears;
+  $("#tl").setAttribute("aria-label", T.tlAria);
+  const loading = $(".loading");
+  if (loading) loading.textContent = T.loading;
+}
+applyStaticText();
 
 let D, PEOPLE, PLACE_PEOPLE, EDGES, STORIES = [], ALL_CLS;
 const S = { y0: MIN_Y, y1: MAX_Y, cls: new Set(), flows: true, spaces: true, view: { type: "overview" }, back: [], playing: null };
@@ -272,7 +439,7 @@ const personOn = (p) => S.cls.has(p.cls);
 // ── Map ─────────────────────────────────────────────────────────────────────
 const map = L.map("map", { zoomControl: false, minZoom: 2, maxZoom: 12, zoomSnap: 0.5, worldCopyJump: false, maxBounds: [[-75, -230], [85, 230]] }).setView([32, -12], window.innerWidth < 600 ? 1.5 : 2.5);
 L.control.zoom({ position: "topleft" }).addTo(map);
-map.attributionControl.setPrefix(false).addAttribution("Outlines: Natural Earth · Routes: Sephardi Spaces");
+map.attributionControl.setPrefix(false).addAttribution(T.attribution);
 for (const [name, z] of [["land", 200], ["flows", 380], ["places", 420], ["route", 460]]) map.createPane(name).style.zIndex = z;
 const R = { land: L.canvas({ pane: "land" }), flows: L.canvas({ pane: "flows" }), places: L.canvas({ pane: "places", tolerance: 4 }), route: L.canvas({ pane: "route" }) };
 const layers = { land: L.layerGroup().addTo(map), flows: L.layerGroup().addTo(map), places: L.layerGroup().addTo(map), spaces: L.layerGroup().addTo(map), route: L.layerGroup().addTo(map) };
@@ -281,8 +448,8 @@ const LayersCtl = L.Control.extend({
   options: { position: "topright" },
   onAdd() {
     const d = L.DomUtil.create("div", "layers");
-    d.innerHTML = `<label><input type="checkbox" id="lyFlows" checked> Migration lines</label>
-      <label><input type="checkbox" id="lySpaces" checked> <span class="swatch" style="background:var(--space);border-radius:1px;transform:rotate(45deg)"></span> World Map spaces</label>`;
+    d.innerHTML = `<label><input type="checkbox" id="lyFlows" checked> ${T.lines}</label>
+      <label><input type="checkbox" id="lySpaces" checked> <span class="swatch" style="background:var(--space);border-radius:1px;transform:rotate(45deg)"></span> ${T.spaces}</label>`;
     L.DomEvent.disableClickPropagation(d);
     return d;
   },
@@ -342,7 +509,7 @@ function drawBase() {
     const m = L.circleMarker([pl.lat, pl.lng], { renderer: R.places, radius: 2.5 + Math.sqrt(set.size) * 1.9, color: ring, weight: 1, fillColor: color, fillOpacity: 0.78 });
     m.on("click", () => go({ type: "place", id }));
     if (i < labelCount && set.size > 1) m.bindTooltip(esc(pl.n), { permanent: true, direction: "right", className: "plabel", offset: [4, 0] });
-    else m.bindTooltip(`<b>${esc(pl.n)}</b><br>${plural(set.size, "person", "people")}`, { direction: "top", offset: [0, -4] });
+    else m.bindTooltip(`<b>${esc(pl.n)}</b><br>${T.people(set.size)}`, { direction: "top", offset: [0, -4] });
     m.addTo(layers.places);
   });
   S.counts = counts;
@@ -354,7 +521,7 @@ function drawSpaces() {
   if (!S.spaces) return;
   for (const sp of D.spaces) {
     const m = L.marker([sp.lat, sp.lng], { icon: L.divIcon({ className: "", html: '<div class="spacepin"></div>', iconSize: [11, 11] }), keyboard: false });
-    m.bindTooltip(`<b>${esc(sp.n)}</b><br>World Map · ${sp.kind === "memory" ? "memory" : sp.kind === "object" ? "object or document" : "place"}`, { direction: "top", offset: [0, -6] });
+    m.bindTooltip(`<b>${esc(sp.n)}</b><br>${T.worldMap} · ${T.kindShort[sp.kind] || T.kindShort.place}`, { direction: "top", offset: [0, -6] });
     m.on("click", () => go({ type: "space", id: sp.id }));
     m.addTo(layers.spaces);
   }
@@ -388,7 +555,7 @@ function drawRoutes(people, current, timed = false) {
     const label = on ? current + 1 : idxs[0] + 1;
     const size = on ? 28 : 20;
     const m = L.marker(ll(pid), { icon: L.divIcon({ className: "", html: `<div class="stopnum${on ? " on" : ""}">${label}</div>`, iconSize: [size, size] }), zIndexOffset: on ? 1000 : 0 });
-    m.bindTooltip(`<b>${esc(D.places[pid].n)}</b><br>Stop ${idxs.map((i) => i + 1).join(", ")}`, { direction: "top", offset: [0, -10] });
+    m.bindTooltip(`<b>${esc(D.places[pid].n)}</b><br>${T.stop} ${idxs.map((i) => i + 1).join(", ")}`, { direction: "top", offset: [0, -10] });
     m.on("click", () => go({ type: "person", id: p.id, stop: idxs[0] }, true));
     m.addTo(layers.route);
   }
@@ -463,7 +630,7 @@ function drawTimeline() {
   $("#tlRange").textContent = `${S.y0} – ${S.y1}`;
   let n = 0;
   for (const p of PEOPLE) if (personOn(p) && p.s.some((x) => inWindow(x.y))) n++;
-  $("#tlNote").textContent = `${plural(n, "person", "people")} on the map${S.cls.size < ALL_CLS.length ? " · filtered" : ""}`;
+  $("#tlNote").textContent = T.onMap(T.people(n), S.cls.size < ALL_CLS.length);
 }
 (function timelineInput() {
   let drag = null;
@@ -502,7 +669,7 @@ function tipAt(e, x) {
   const y = yOfX(x), d = Math.floor(y / 10) * 10, v = bins().get(d);
   const tip = $("#tip");
   if (!v) return (tip.hidden = true);
-  tip.innerHTML = `<b>${d}s</b> · ${plural(v.text + v.est, "stop")}<br><span style="color:var(--muted)">${v.text} with a year in the story, ${v.est} estimated</span>`;
+  tip.innerHTML = `<b>${T.decade(d)}</b> · ${T.stops(v.text + v.est)}<br><span style="color:var(--muted)">${T.tipCounts(v.text, v.est)}</span>`;
   tip.hidden = false;
   tip.style.left = Math.min(e.clientX + 12, window.innerWidth - 230) + "px";
   tip.style.top = e.clientY - 56 + "px";
@@ -512,7 +679,7 @@ $("#reset").onclick = () => { stopPlay(); setWindow(MIN_Y, MAX_Y); };
 $("#play").onclick = () => (S.playing ? stopPlay() : startPlay());
 function startPlay() {
   if (fullRange() || S.y1 >= MAX_Y) { S.y0 = 1480; S.y1 = 1480 + PLAY_WINDOW; }
-  $("#play").textContent = "❚❚ Pause";
+  $("#play").textContent = T.pause;
   S.playing = setInterval(() => {
     if (S.y1 + PLAY_STEP > MAX_Y) return stopPlay();
     S.y0 += PLAY_STEP; S.y1 += PLAY_STEP;
@@ -523,7 +690,7 @@ function startPlay() {
 function stopPlay() {
   if (!S.playing) return;
   clearInterval(S.playing); S.playing = null;
-  $("#play").textContent = "▶ Play";
+  $("#play").textContent = T.play;
   refresh();
 }
 
@@ -536,13 +703,13 @@ function selectedPerson() {
   return null;
 }
 function crumbs() {
-  return `<div class="crumbs"><button data-act="back" type="button">← ${S.back.length ? "Back" : "Overview"}</button></div>`;
+  return `<div class="crumbs"><button data-act="back" type="button">← ${S.back.length ? T.back : T.overview}</button></div>`;
 }
 function peopleRows(list, placeId) {
   return list.map(({ p, s, i }) => {
     const prev = i > 0 ? D.places[p.s[i - 1].p].n : null, next = i < p.s.length - 1 ? D.places[p.s[i + 1].p].n : null;
-    const via = [prev && prev !== D.places[placeId]?.n ? `from ${prev}` : "", next && next !== D.places[placeId]?.n ? `then ${next}` : ""].filter(Boolean).join(" · ");
-    return `<li><button class="row" type="button" data-act="person" data-id="${p.id}" data-stop="${i}"><span class="yr${s.k ? "" : " est"}">${s.y == null ? "—" : s.k ? s.y : "c." + s.y}</span><span class="nm">${esc(p.n)}<span class="sub">${esc(via || p.cls)}</span></span></button></li>`;
+    const via = [prev && prev !== D.places[placeId]?.n ? T.from(prev) : "", next && next !== D.places[placeId]?.n ? T.then(next) : ""].filter(Boolean).join(" · ");
+    return `<li><button class="row" type="button" data-act="person" data-id="${p.id}" data-stop="${i}"><span class="yr${s.k ? "" : " est"}">${s.y == null ? "—" : s.k ? s.y : "c." + s.y}</span><span class="nm">${esc(p.n)}<span class="sub">${esc(via || clsName(p.cls))}</span></span></button></li>`;
   }).join("");
 }
 
@@ -553,21 +720,22 @@ const VIEWS = {
     const max = top[0]?.[1].size || 1;
     const st = D.stats;
     return `
-      <div class="eyebrow">Sephardi Spaces · University of Miami</div>
-      <h1>Where Sephardi lives crossed</h1>
-      <p class="lead">Every migration route in the Sephardi Spaces archive on one map. Drag the timeline to choose years, or press Play to watch the routes unfold. Select a city to see who passed through it.</p>
-      <div class="stats"><div><b>${st.people}</b><span>lives</span></div><div><b>${st.stops.toLocaleString()}</b><span>route stops</span></div><div><b>${st.places}</b><span>places</span></div><div><b>${st.spaces}</b><span>World Map spaces</span></div></div>
-      <section class="block"><h2>Guided stories</h2><div class="stories">
-        ${STORIES.map((s) => `<button class="story-card" type="button" data-act="story" data-id="${s.id}"><em>${s.steps.length} steps</em><b>${esc(s.title)}</b><span>${esc(s.intro)}</span></button>`).join("")}
+      <div class="eyebrow">${T.eyebrow}</div>
+      <h1>${T.title}</h1>
+      <p class="lead">${T.lead}</p>
+      <div class="stats"><div><b>${st.people}</b><span>${T.statLives}</span></div><div><b>${st.stops.toLocaleString(T.locale)}</b><span>${T.statStops}</span></div><div><b>${st.places}</b><span>${T.statPlaces}</span></div><div><b>${st.spaces}</b><span>${T.statSpaces}</span></div></div>
+      <section class="block"><h2>${T.stories}</h2><div class="stories">
+        ${STORIES.map((s) => `<button class="story-card" type="button" data-act="story" data-id="${s.id}"><em>${T.steps(s.steps.length)}</em><b>${esc(storyText(s, "title"))}</b><span>${esc(storyText(s, "intro"))}</span></button>`).join("")}
       </div></section>
-      <section class="block"><h2>Busiest places ${fullRange() ? "" : `<span class="meta">· ${S.y0}–${S.y1}</span>`}</h2>
-        <ul class="list">${top.map(([id, set]) => `<li><button class="row count" type="button" data-act="place" data-id="${id}"><span class="nm">${esc(D.places[id].n)}<span class="sub">${esc(D.places[id].c)}</span><div class="bar" style="width:${(set.size / max) * 100}%"></div></span><span class="yr">${set.size}</span></button></li>`).join("") || `<li class="empty">No routes in these years.</li>`}</ul>
+      <section class="block"><h2>${T.busiest} ${fullRange() ? "" : `<span class="meta">· ${S.y0}–${S.y1}</span>`}</h2>
+        <ul class="list">${top.map(([id, set]) => `<li><button class="row count" type="button" data-act="place" data-id="${id}"><span class="nm">${esc(D.places[id].n)}<span class="sub">${esc(D.places[id].c)}</span><div class="bar" style="width:${(set.size / max) * 100}%"></div></span><span class="yr">${set.size}</span></button></li>`).join("") || `<li class="empty">${T.noRoutes}</li>`}</ul>
       </section>
-      <section class="block"><h2>Communities</h2>
-        <div class="chips">${ALL_CLS.map((c) => `<button class="chip" type="button" data-act="cls" data-cls="${esc(c)}" aria-pressed="${S.cls.has(c)}">${esc(c)} <span class="meta">${PEOPLE.filter((p) => p.cls === c).length}</span></button>`).join("")}</div>
-        <span class="meta">Select a group to hide or show it. The classification comes from each character's profile.</span>
+      <section class="block"><h2>${T.communities}</h2>
+        <div class="chips">${ALL_CLS.map((c) => `<button class="chip" type="button" data-act="cls" data-cls="${esc(c)}" aria-pressed="${S.cls.has(c)}">${esc(clsName(c, true))} <span class="meta">${PEOPLE.filter((p) => p.cls === c).length}</span></button>`).join("")}</div>
+        <span class="meta">${T.chipsHelp}</span>
       </section>
-      <p class="note">Built on ${esc(D.builtAt)} from the team's route sheets and the Sephardi World Map. Years printed plainly come from the story text; years marked “c.” are estimated from the order of the route and the person's birth and death. ${st.undated} stops have no year and appear only when all years are shown.</p>`;
+      ${T.contentNote ? `<p class="note">${T.contentNote}</p>` : ""}
+      <p class="note">${T.builtNote(esc(D.builtAt), st.undated)}</p>`;
   },
 
   place(v) {
@@ -588,23 +756,23 @@ const VIEWS = {
     }
     const near = D.spaces.filter((sp) => Math.hypot(sp.lat - pl.lat, (sp.lng - pl.lng) * Math.cos((pl.lat * Math.PI) / 180)) < 0.3);
     return `${crumbs()}
-      <div class="eyebrow">Place${pl.c ? " · " + esc(pl.c) : ""}</div>
+      <div class="eyebrow">${T.place}${pl.c ? " · " + esc(pl.c) : ""}</div>
       <h1 class="place">${esc(pl.n)}</h1>
-      <div class="stats"><div><b>${seen.size}</b><span>${seen.size === 1 ? "person" : "people"}</span></div><div><b>${visits.length}</b><span>route stops</span></div>${years.length ? `<div><b>${Math.min(...years)}–${Math.max(...years)}</b><span>years</span></div>` : ""}</div>
-      ${fullRange() ? "" : `<p class="meta">Showing ${S.y0}–${S.y1}. <button class="more" type="button" data-act="allyears">Show all years</button></p>`}
-      ${sites.size ? `<section class="block"><h2>Sites named in the stories</h2><div class="chips">${[...sites.entries()].sort((a, b) => b[1] - a[1]).slice(0, 14).map(([n]) => `<span class="tag">${esc(n)}</span>`).join("")}</div></section>` : ""}
-      ${near.length ? `<section class="block"><h2>On the Sephardi World Map</h2><ul class="list">${near.map((sp) => `<li><button class="row count" type="button" data-act="space" data-id="${sp.id}"><span class="nm">${esc(sp.n)}</span><span class="swatch" style="background:var(--space)"></span></button></li>`).join("")}</ul></section>` : ""}
-      <section class="block"><h2>Who came here</h2><ul class="list">${peopleRows(rows, v.id) || `<li class="empty">No one in these years.</li>`}</ul></section>
-      ${pl.alt.length ? `<p class="note">Also recorded nearby as: ${pl.alt.map(esc).join(", ")}.</p>` : ""}`;
+      <div class="stats"><div><b>${seen.size}</b><span>${T.people(seen.size).replace(/^[\d.,]+ /, "")}</span></div><div><b>${visits.length}</b><span>${T.statStops}</span></div>${years.length ? `<div><b>${Math.min(...years)}–${Math.max(...years)}</b><span>${T.years}</span></div>` : ""}</div>
+      ${fullRange() ? "" : `<p class="meta">${T.showing(S.y0, S.y1)} <button class="more" type="button" data-act="allyears">${T.showAll}</button></p>`}
+      ${sites.size ? `<section class="block"><h2>${T.sitesNamed}</h2><div class="chips">${[...sites.entries()].sort((a, b) => b[1] - a[1]).slice(0, 14).map(([n]) => `<span class="tag">${esc(n)}</span>`).join("")}</div></section>` : ""}
+      ${near.length ? `<section class="block"><h2>${T.onWorldMap}</h2><ul class="list">${near.map((sp) => `<li><button class="row count" type="button" data-act="space" data-id="${sp.id}"><span class="nm">${esc(sp.n)}</span><span class="swatch" style="background:var(--space)"></span></button></li>`).join("")}</ul></section>` : ""}
+      <section class="block"><h2>${T.whoCame}</h2><ul class="list">${peopleRows(rows, v.id) || `<li class="empty">${T.noOne}</li>`}</ul></section>
+      ${pl.alt.length ? `<p class="note">${T.alsoAs(pl.alt.map(esc).join(", "))}</p>` : ""}`;
   },
 
   person(v) {
     const p = PEOPLE.byId.get(v.id);
     return `${crumbs()}
-      <div class="eyebrow">${esc(p.cls)}</div>
+      <div class="eyebrow">${esc(clsName(p.cls))}</div>
       <h1>${esc(p.n)}</h1>
-      <p class="meta">${esc(lifeSpan(p))}${p.aka ? ` · also known as ${esc(p.aka)}` : ""} · ${plural(p.s.length, "stop")}</p>
-      <div class="links">${p.url ? `<a href="${esc(p.url)}" target="_blank" rel="noopener">Full profile ↗</a>` : ""}${p.map ? `<a href="${esc(p.map)}" target="_blank" rel="noopener">Story map ↗</a>` : ""}</div>
+      <p class="meta">${esc(lifeSpan(p))}${p.aka ? ` · ${T.aka(esc(p.aka))}` : ""} · ${T.stops(p.s.length)}</p>
+      <div class="links">${p.url ? `<a href="${esc(p.url)}" target="_blank" rel="noopener">${T.profile}</a>` : ""}${p.map ? `<a href="${esc(p.map)}" target="_blank" rel="noopener">${T.storyMap}</a>` : ""}</div>
       <ol class="stops">${p.s.map((s, i) => stopItem(p, s, i, i === v.stop)).join("")}</ol>`;
   },
 
@@ -612,14 +780,14 @@ const VIEWS = {
     const story = STORIES.find((x) => x.id === v.id);
     const step = story.steps[v.step], p = PEOPLE.byId.get(step.person), s = p.s[step.stop];
     return `${crumbs()}
-      <div class="eyebrow">Guided story · step ${v.step + 1} of ${story.steps.length}</div>
-      <h1>${esc(story.title)}</h1>
+      <div class="eyebrow">${T.storyStep(v.step + 1, story.steps.length)}</div>
+      <h1>${esc(storyText(story, "title"))}</h1>
       <div class="storybox">
-        ${v.step === 0 ? `<blockquote>${esc(story.intro)}</blockquote>` : ""}
+        ${v.step === 0 ? `<blockquote>${esc(storyText(story, "intro"))}</blockquote>` : ""}
         <div class="stepnav">
-          <button class="btn" type="button" data-act="step" data-step="${v.step - 1}" ${v.step === 0 ? "disabled" : ""} aria-label="Previous step">‹</button>
-          <div class="dots">${story.steps.map((_, i) => `<button type="button" data-act="step" data-step="${i}" aria-label="Step ${i + 1}" aria-current="${i === v.step}"></button>`).join("")}</div>
-          <button class="btn primary" type="button" data-act="step" data-step="${v.step + 1}" ${v.step === story.steps.length - 1 ? "disabled" : ""}>Next ›</button>
+          <button class="btn" type="button" data-act="step" data-step="${v.step - 1}" ${v.step === 0 ? "disabled" : ""} aria-label="${T.prevStep}">‹</button>
+          <div class="dots">${story.steps.map((_, i) => `<button type="button" data-act="step" data-step="${i}" aria-label="${T.stepN(i + 1)}" aria-current="${i === v.step}"></button>`).join("")}</div>
+          <button class="btn primary" type="button" data-act="step" data-step="${v.step + 1}" ${v.step === story.steps.length - 1 ? "disabled" : ""}>${T.next}</button>
         </div>
         <div class="step-card">
           <button class="who" type="button" data-act="person" data-id="${p.id}" data-stop="${step.stop}">${esc(p.n)} <span class="meta">${esc(lifeSpan(p))}</span></button>
@@ -627,10 +795,10 @@ const VIEWS = {
           <h3>${esc(s.t)}</h3>
           ${pic(s)}
           <div class="desc">${paras(s.d)}</div>
-          ${step.note ? `<p class="lead">${esc(step.note)}</p>` : ""}
+          ${storyText(step, "note") ? `<p class="lead">${esc(storyText(step, "note"))}</p>` : ""}
         </div>
       </div>
-      <p class="note">This story is a draft assembled from the route sheets. Its steps live in <code>stories.json</code>, so the team can add or reorder steps without touching the map.</p>`;
+      <p class="note">${T.draftNote}</p>`;
   },
 
   space(v) {
@@ -638,12 +806,12 @@ const VIEWS = {
     let nearest = null, best = Infinity;
     for (const pl of D.places) { const d = Math.hypot(pl.lat - sp.lat, pl.lng - sp.lng); if (d < best) (best = d), (nearest = pl); }
     return `${crumbs()}
-      <div class="eyebrow">Sephardi World Map · ${sp.kind === "memory" ? "Person, family or community memory" : sp.kind === "object" ? "Object or document" : "Place or monument"}</div>
+      <div class="eyebrow">${T.worldMapLong} · ${T.kindLong[sp.kind] || T.kindLong.place}</div>
       <h1 class="place">${esc(sp.n)}</h1>
-      ${sp.story ? `<div class="lead">${paras(sp.story)}</div>` : `<p class="empty">No story has been added for this point yet.</p>`}
-      ${/^https?:\/\//.test(sp.src) ? `<div class="links"><a href="${esc(sp.src)}" target="_blank" rel="noopener">Source ↗</a></div>` : sp.src ? `<p class="meta">Source: ${esc(sp.src)}</p>` : ""}
-      ${nearest && best < 0.5 ? `<button class="row count" type="button" data-act="place" data-id="${nearest.id}"><span class="nm">Routes through ${esc(nearest.n)}<span class="sub">See everyone who passed through</span></span><span class="yr">→</span></button>` : ""}
-      <p class="note">Points on the World Map are added by the public through the survey on <a href="${SITE}/sephardi-map/" target="_blank" rel="noopener">the World Map page</a>.</p>`;
+      ${sp.story ? `<div class="lead">${paras(sp.story)}</div>` : `<p class="empty">${T.noStory}</p>`}
+      ${/^https?:\/\//.test(sp.src) ? `<div class="links"><a href="${esc(sp.src)}" target="_blank" rel="noopener">${T.source}</a></div>` : sp.src ? `<p class="meta">${T.sourceText} ${esc(sp.src)}</p>` : ""}
+      ${nearest && best < 0.5 ? `<button class="row count" type="button" data-act="place" data-id="${nearest.id}"><span class="nm">${T.routesThrough(esc(nearest.n))}<span class="sub">${T.seeEveryone}</span></span><span class="yr">→</span></button>` : ""}
+      <p class="note">${T.worldMapNote(T.worldMapUrl)}</p>`;
   },
 
   search(v) {
@@ -652,10 +820,10 @@ const VIEWS = {
     const places = D.places.filter((pl) => fold(pl.n).includes(q) || pl.alt.some((a) => fold(a).includes(q))).sort((a, b) => pc(b.id) - pc(a.id)).slice(0, 8);
     const people = PEOPLE.filter((p) => fold(`${p.n} ${p.aka}`).includes(q));
     const wordHit = people.filter((p) => fold(`${p.n} ${p.aka}`).split(/[^a-z]+/).includes(q));
-    return `<div class="eyebrow">Search</div><h1>“${esc(v.q.trim())}”</h1>
-      ${wordHit.length > 1 ? `<button class="story-card" type="button" data-act="surname" data-q="${esc(v.q.trim())}"><em>Surname map</em><b>Show all ${wordHit.length} people named ${esc(v.q.trim())} on the map</b><span>Their routes are drawn together, so you can see where the name travelled.</span></button>` : ""}
-      ${places.length ? `<section class="block"><h2>Places</h2><ul class="list">${places.map((pl) => `<li><button class="row count" type="button" data-act="place" data-id="${pl.id}"><span class="nm">${esc(pl.n)}<span class="sub">${esc(pl.c)}</span></span><span class="yr">${pc(pl.id)}</span></button></li>`).join("")}</ul></section>` : ""}
-      <section class="block"><h2>People</h2><ul class="list">${people.slice(0, 40).map((p) => `<li><button class="row" type="button" data-act="person" data-id="${p.id}"><span class="yr">${esc(p.b || "")}</span><span class="nm">${esc(p.n)}<span class="sub">${esc(p.cls)}</span></span></button></li>`).join("") || `<li class="empty">No one by that name. Try a surname or a city.</li>`}</ul></section>`;
+    return `<div class="eyebrow">${T.search}</div><h1>“${esc(v.q.trim())}”</h1>
+      ${wordHit.length > 1 ? `<button class="story-card" type="button" data-act="surname" data-q="${esc(v.q.trim())}"><em>${T.surnameMap}</em><b>${T.showSurname(wordHit.length, esc(v.q.trim()))}</b><span>${T.surnameHelp}</span></button>` : ""}
+      ${places.length ? `<section class="block"><h2>${T.placesH}</h2><ul class="list">${places.map((pl) => `<li><button class="row count" type="button" data-act="place" data-id="${pl.id}"><span class="nm">${esc(pl.n)}<span class="sub">${esc(pl.c)}</span></span><span class="yr">${pc(pl.id)}</span></button></li>`).join("")}</ul></section>` : ""}
+      <section class="block"><h2>${T.peopleH}</h2><ul class="list">${people.slice(0, 40).map((p) => `<li><button class="row" type="button" data-act="person" data-id="${p.id}"><span class="yr">${esc(p.b || "")}</span><span class="nm">${esc(p.n)}<span class="sub">${esc(clsName(p.cls))}</span></span></button></li>`).join("") || `<li class="empty">${T.noName}</li>`}</ul></section>`;
   },
 
   surname(v) {
@@ -663,8 +831,8 @@ const VIEWS = {
     const list = PEOPLE.filter((p) => fold(`${p.n} ${p.aka}`).split(/[^a-z]+/).includes(q)).sort((a, b) => (parseInt(a.b) || 9999) - (parseInt(b.b) || 9999));
     const places = new Map();
     for (const p of list) for (const s of p.s) places.set(s.p, (places.get(s.p) || 0) + 1);
-    return `${crumbs()}<div class="eyebrow">Surname map</div><h1>${esc(v.q)}</h1>
-      <p class="lead">${plural(list.length, "person", "people")} in ${plural(places.size, "place")}. Their routes are drawn in orange.</p>
+    return `${crumbs()}<div class="eyebrow">${T.surnameMap}</div><h1>${esc(v.q)}</h1>
+      <p class="lead">${T.surnameLead(T.people(list.length), T.places(places.size))}</p>
       <ul class="list">${list.map((p) => `<li><button class="row" type="button" data-act="person" data-id="${p.id}"><span class="yr">${esc(p.b || "")}</span><span class="nm">${esc(p.n)}<span class="sub">${esc(p.s.map((s) => D.places[s.p].n).filter((n, i, a) => n !== a[i - 1]).slice(0, 5).join(" → "))}${p.s.length > 5 ? " …" : ""}</span></span></button></li>`).join("")}</ul>`;
   },
 };
@@ -678,7 +846,7 @@ function stopItem(p, s, i, on) {
     <button class="head" type="button" data-act="stop" data-stop="${i}"><b>${esc(s.t || D.places[s.p].n)}</b><span>${esc(s.loc || D.places[s.p].n)} · <span class="${s.k ? "" : "est"}">${yearLabel(s)}</span></span></button>
     ${on ? pic(s) : ""}
     <div class="desc${on ? "" : " clamp"}">${paras(s.d)}</div>
-    ${on ? "" : `<button class="more" type="button" data-act="stop" data-stop="${i}">Read more</button>`}
+    ${on ? "" : `<button class="more" type="button" data-act="stop" data-stop="${i}">${T.readMore}</button>`}
   </div></li>`;
 }
 
@@ -806,7 +974,7 @@ new MutationObserver(redrawAll).observe(document.documentElement, { attributes: 
 const ON_SITE = document.documentElement.hasAttribute("data-atlas-site");
 if (ON_SITE) {
   const btn = $("#themeBtn");
-  const label = () => (btn.textContent = document.documentElement.dataset.theme === "dark" ? "☀ Day" : "☾ Night");
+  const label = () => (btn.textContent = document.documentElement.dataset.theme === "dark" ? T.day : T.night);
   btn.hidden = false;
   label();
   btn.onclick = () => {
@@ -828,6 +996,12 @@ function fromHash() {
   if (type === "place") return D.places[+id] ? { type, id: +id } : null;
   return D.spaces.some((s) => s.id === +id) ? { type, id: +id } : null;
 }
+// A link to another place, person or story opened in the same tab.
+window.addEventListener("hashchange", () => {
+  if (!D) return;
+  const v = fromHash();
+  if (v && hashFor(v) !== hashFor(S.view)) go(v);
+});
 (async function boot() {
   try {
     const get = (u) => fetch(u).then((r) => { if (!r.ok) throw new Error(`${u}: HTTP ${r.status}`); return r.json(); });
@@ -848,7 +1022,7 @@ function fromHash() {
     S.view = fromHash() || { type: "overview" };
     render(S.view.type !== "overview");
   } catch (err) {
-    panel.innerHTML = `<div class="pin"><h1>The atlas could not load</h1><p class="lead">${esc(err.message)}. Reload the page to try again.</p></div>`;
+    panel.innerHTML = `<div class="pin"><h1>${T.loadFail}</h1><p class="lead">${esc(err.message)}. ${T.reload}</p></div>`;
   }
 })();
 </script>

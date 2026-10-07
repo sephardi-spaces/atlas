@@ -1,54 +1,150 @@
 {
-  "_help": "Guided stories for the Atlas. Each step points at one stop of one character's route: person = character ID (as in /character/<ID>), stop = position in that route, counting from 0. The text of each step comes from the route sheet itself; 'note' adds an optional line of your own. These three are drafts made from the current data for the team to edit.",
+  "_help": "Guided stories for the Atlas. Each step points at one stop of one character's route: person = character ID (as in /character/<ID>), stop = position in that route, counting from 0. The text of each step comes from the route sheet itself; 'note' adds an optional line of your own. These three are drafts made from the current data for the team to edit. Spanish and Ladino versions go in title_es/intro_es and title_lad/intro_lad (and note_es/note_lad on a step); if one is missing the English is shown.",
   "stories": [
     {
       "id": "lisbon-amsterdam",
       "title": "From Lisbon to Amsterdam",
       "intro": "Four converso families leave Portugal, where the Inquisition watched them, and rebuild open Jewish lives in Amsterdam's Portuguese community. The same journey repeats across almost two centuries.",
       "steps": [
-        { "person": 246, "stop": 0 },
-        { "person": 246, "stop": 2 },
-        { "person": 137, "stop": 0 },
-        { "person": 137, "stop": 1 },
-        { "person": 8, "stop": 0 },
-        { "person": 8, "stop": 1 },
-        { "person": 149, "stop": 0 },
-        { "person": 149, "stop": 2 }
-      ]
+        {
+          "person": 246,
+          "stop": 0
+        },
+        {
+          "person": 246,
+          "stop": 2
+        },
+        {
+          "person": 137,
+          "stop": 0
+        },
+        {
+          "person": 137,
+          "stop": 1
+        },
+        {
+          "person": 8,
+          "stop": 0
+        },
+        {
+          "person": 8,
+          "stop": 1
+        },
+        {
+          "person": 149,
+          "stop": 0
+        },
+        {
+          "person": 149,
+          "stop": 2
+        }
+      ],
+      "title_es": "De Lisboa a Ámsterdam",
+      "intro_es": "Cuatro familias conversas abandonan Portugal, donde la Inquisición las vigilaba, y rehacen una vida judía abierta en la comunidad portuguesa de Ámsterdam. El mismo viaje se repite a lo largo de casi dos siglos.",
+      "title_lad": "De Lisboa a Amsterdam",
+      "intro_lad": "Kuatro famiyas konversas se van de Portugal, ande la Inkizision las vijilava, i fraguan de muevo una vida djudia avierta en la komunidad portugeza de Amsterdam. El mismo viaje se repite durante kaji dos siglos."
     },
     {
       "id": "ottoman-new-york",
       "title": "Salonica and Smyrna to New York",
       "intro": "Eastern Sephardim from the Ottoman port cities reach New York between the 1880s and the 1940s, bringing Ladino, trade networks and their own institutions.",
       "steps": [
-        { "person": 10, "stop": 0 },
-        { "person": 10, "stop": 2 },
-        { "person": 4, "stop": 0 },
-        { "person": 4, "stop": 1 },
-        { "person": 11, "stop": 6 },
-        { "person": 11, "stop": 8 },
-        { "person": 28, "stop": 0 },
-        { "person": 28, "stop": 2 },
-        { "person": 7, "stop": 2 },
-        { "person": 7, "stop": 4 }
-      ]
+        {
+          "person": 10,
+          "stop": 0
+        },
+        {
+          "person": 10,
+          "stop": 2
+        },
+        {
+          "person": 4,
+          "stop": 0
+        },
+        {
+          "person": 4,
+          "stop": 1
+        },
+        {
+          "person": 11,
+          "stop": 6
+        },
+        {
+          "person": 11,
+          "stop": 8
+        },
+        {
+          "person": 28,
+          "stop": 0
+        },
+        {
+          "person": 28,
+          "stop": 2
+        },
+        {
+          "person": 7,
+          "stop": 2
+        },
+        {
+          "person": 7,
+          "stop": 4
+        }
+      ],
+      "title_es": "De Salónica y Esmirna a Nueva York",
+      "intro_es": "Sefardíes orientales de los puertos otomanos llegan a Nueva York entre la década de 1880 y la de 1940, con el ladino, sus redes comerciales y sus propias instituciones.",
+      "title_lad": "De Saloniko i Izmir a Nueva York",
+      "intro_lad": "Sefaradim orientales de los puertos otomanos yegan a Nueva York entre los anyos 1880 i 1940, kon el ladino, sus redes de komersio i sus propias instituisiones."
     },
     {
       "id": "leaving-baghdad",
       "title": "Leaving Baghdad",
       "intro": "Children of Baghdad's Jewish community, born in the 1930s and 1940s, pass through London as the community leaves Iraq between 1948 and the 1970s.",
       "steps": [
-        { "person": 204, "stop": 0 },
-        { "person": 204, "stop": 2 },
-        { "person": 203, "stop": 0 },
-        { "person": 203, "stop": 3 },
-        { "person": 184, "stop": 0 },
-        { "person": 184, "stop": 8 },
-        { "person": 217, "stop": 0 },
-        { "person": 217, "stop": 8 },
-        { "person": 218, "stop": 0 },
-        { "person": 218, "stop": 5 }
-      ]
+        {
+          "person": 204,
+          "stop": 0
+        },
+        {
+          "person": 204,
+          "stop": 2
+        },
+        {
+          "person": 203,
+          "stop": 0
+        },
+        {
+          "person": 203,
+          "stop": 3
+        },
+        {
+          "person": 184,
+          "stop": 0
+        },
+        {
+          "person": 184,
+          "stop": 8
+        },
+        {
+          "person": 217,
+          "stop": 0
+        },
+        {
+          "person": 217,
+          "stop": 8
+        },
+        {
+          "person": 218,
+          "stop": 0
+        },
+        {
+          "person": 218,
+          "stop": 5
+        }
+      ],
+      "title_es": "La salida de Bagdad",
+      "intro_es": "Hijos de la comunidad judía de Bagdad, nacidos en las décadas de 1930 y 1940, pasan por Londres mientras la comunidad abandona Irak entre 1948 y la década de 1970.",
+      "title_lad": "La salida de Bagdad",
+      "intro_lad": "Ijos de la komunidad djudia de Bagdad, nasidos en los anyos 1930 i 1940, pasan por Londres mientres ke la komunidad se va de Irak entre 1948 i los anyos 1970."
     }
   ]
 }
