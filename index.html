@@ -199,7 +199,7 @@ figure.pic figcaption { font-size: 11px; color: var(--muted); margin-top: 3px; }
   :root { --panel-w: 100%; }
   .main { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) minmax(0, 46%); }
   aside.panel { border-left: 0; border-top: 1px solid var(--line); }
-  .brand span, #fullBtn { display: none; }
+  .brand span { display: none; }
   .brand b { font-size: 16px; }
   .pin { padding: 16px 16px 28px; }
   h1.place { font-size: 26px; }
@@ -221,7 +221,6 @@ figure.pic figcaption { font-size: 11px; color: var(--muted); margin-top: 3px; }
       <input id="q" type="search" placeholder="Search a name, surname or city" autocomplete="off" aria-label="Search people, surnames and places">
     </label>
     <button class="hbtn" id="themeBtn" type="button" hidden aria-label="Switch between day and night map">☾ Night</button>
-    <a class="hbtn" id="fullBtn" href="#" target="_blank" rel="noopener" hidden>Full screen ↗</a>
   </header>
   <div class="main">
     <div class="stage">
@@ -789,7 +788,8 @@ new MutationObserver(redrawAll).observe(document.documentElement, { attributes: 
 
 // On the website (not in the claude.ai preview, which sets its own theme) the
 // Atlas opens in day mode to match sepharad.miami.edu; the button switches to
-// night and the choice is remembered on this device.
+// night and the choice is remembered on this device. (The WordPress page
+// sepharad.miami.edu/atlas/ shows this page full-size under the site header.)
 const ON_SITE = document.documentElement.hasAttribute("data-atlas-site");
 if (ON_SITE) {
   const btn = $("#themeBtn");
@@ -802,13 +802,6 @@ if (ON_SITE) {
     try { localStorage.setItem("atlas-theme", next); } catch {}
     label();
   };
-  // Shown inside the WordPress page: offer the Atlas on its own, full size.
-  if (window.self !== window.top) {
-    const a = $("#fullBtn");
-    a.hidden = false;
-    a.onclick = () => { a.href = location.href.split("#")[0] + location.hash; };
-    a.href = location.href;
-  }
 }
 
 // ── Start ───────────────────────────────────────────────────────────────────
