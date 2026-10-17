@@ -470,9 +470,29 @@ function arc(a, b, bend = 0.18) {
 }
 const ll = (placeId) => [D.places[placeId].lat, D.places[placeId].lng];
 
+// Shapes that cross the 180° line (eastern Russia, Fiji) jump from +180 to -180;
+// drawn as-is they leave a band across the whole map. Keep them on the east side.
+function unwrapDateline(fc) {
+  for (const f of fc.features) {
+    const polys = f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.type === "MultiPolygon" ? f.geometry.coordinates : [];
+    for (const poly of polys) {
+      for (const ring of poly) {
+        let crosses = false, minY = 90;
+        for (let i = 0; i < ring.length; i++) {
+          minY = Math.min(minY, ring[i][1]);
+          if (i && Math.abs(ring[i][0] - ring[i - 1][0]) > 180) crosses = true;
+        }
+        if (crosses && minY > -85) for (const pt of ring) if (pt[0] < 0) pt[0] += 360; // Antarctica is left alone
+      }
+    }
+  }
+  return fc;
+}
+let LAND;
 function drawLand(world) {
   layers.land.clearLayers();
-  L.geoJSON(topojson.feature(world, world.objects.countries), {
+  LAND = LAND || unwrapDateline(topojson.feature(world, world.objects.countries));
+  L.geoJSON(LAND, {
     renderer: R.land, interactive: false,
     style: () => ({ color: css("--land-edge"), weight: 0.6, fillColor: css("--land"), fillOpacity: 1 }),
   }).addTo(layers.land);
